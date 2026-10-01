@@ -1,0 +1,31 @@
+[project]
+name = "ds-supply-chain-forecasting"
+version = "0.1.0"
+description = "Demand forecasting and inventory planning with backtested models"
+readme = "README.md"
+authors = [{ name = "Zaynab Zennour" }]
+license = { text = "MIT" }
+requires-python = ">=3.12"
+dependencies = ["pandas", "numpy", "scikit-learn", "statsmodels", "matplotlib", "pyarrow", "tabulate"]
+
+[dependency-groups]
+dev = ["pytest>=8", "ruff>=0.6"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/demand_forecast"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["E501"]  # long lines are left to the formatter
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

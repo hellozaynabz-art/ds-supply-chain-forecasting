@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[oc]
+.venv/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+
+# Secrets
+.env
+
+# Data (regenerate with `make data`)
+data/raw/
+data/processed/
+*.duckdb
+*.duckdb.wal
+
+# OS / editors
+.DS_Store
+.idea/
+.vscode/
