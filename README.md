@@ -32,7 +32,7 @@ Full results: [`reports/REPORT.md`](reports/REPORT.md)
 | Synthetic (default) | 200 series × 3 years with trend, yearly seasonality, promotions and slow movers | `make data` |
 | Kaggle | [Forecasts for Product Demand](https://www.kaggle.com/datasets/felixzhao/productdemandforecasting): 1M+ orders from 4 warehouses; the 200 highest-volume series are kept | `make data SOURCE=kaggle` |
 
-Kaggle needs an API token at `~/.kaggle/kaggle.json` ([how to get one](https://www.kaggle.com/docs/api)).
+Kaggle needs a one-time sign-in: run `uvx kaggle auth login` (opens your browser).
 
 ## Run it
 
