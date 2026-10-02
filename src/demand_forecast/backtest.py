@@ -129,7 +129,11 @@ def main() -> None:
         )
     results = pd.DataFrame(rows).sort_values("WAPE").reset_index(drop=True)
     best = results.iloc[0]
-    naive = results.set_index("model").loc["Moving average (8w)"]  # the usual spreadsheet method
+    by_model = results.set_index("model")
+    # The business choice: least inventory among models that still meet the service target.
+    eligible = results[results["fill_rate"] >= SERVICE_TARGET]
+    pick = (eligible if len(eligible) else results).sort_values("avg_inventory_units").iloc[0]
+    worst_stock = by_model["avg_inventory_units"].max()
 
     _plot_examples(panel, eval_origin, eval_fc, best["model"])
     _plot_tradeoff(results)
@@ -139,7 +143,7 @@ def main() -> None:
         fmt[c] = fmt[c].map("{:.1%}".format)
     fmt["MASE"] = fmt["MASE"].map("{:.2f}".format)
     fmt["avg_inventory_units"] = fmt["avg_inventory_units"].map("{:,.0f}".format)
-    inv_change = best["avg_inventory_units"] / naive["avg_inventory_units"] - 1
+    saving = 1 - pick["avg_inventory_units"] / worst_stock
 
     report = f"""# Demand Forecasting & Inventory Backtest
 
@@ -162,9 +166,11 @@ for a {SERVICE_TARGET:.0%} service target from that model's own historical error
 
 ![tradeoff](tradeoff.png)
 
-**{best["model"]}** reaches a {best["fill_rate"]:.1%} fill rate while holding
-**{abs(inv_change):.0%} {"less" if inv_change < 0 else "more"} inventory** than an 8-week moving average,
-the method most planning spreadsheets use ({naive["fill_rate"]:.1%} fill rate).
+- **Most accurate:** {best["model"]} (WAPE {best["WAPE"]:.1%}).
+- **Recommended for planning:** **{pick["model"]}**, which meets the {SERVICE_TARGET:.0%} service target
+  ({pick["fill_rate"]:.1%} fill rate) with the least inventory, **{saving:.0%} less** than the most
+  stock-heavy model.
+{"- A simple baseline wins here: with lumpy, intermittent demand, extra model complexity mostly adds variance. Worth knowing before investing in ML forecasting." if pick["model"] in ("Moving average (8w)", "Seasonal naive") else ""}
 
 ![examples](examples.png)
 """

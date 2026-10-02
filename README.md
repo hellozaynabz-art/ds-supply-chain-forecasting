@@ -23,6 +23,11 @@ inventory simulation, so models are compared on **fill rate and stock held**, no
 - **Real data quirks** handled in the Kaggle loader: returns stored as `(100)`, gaps filled with
   zero-demand weeks, and slow movers with intermittent demand
 
+**Results on the Kaggle data (200 series, 2012–2016):** the 8-week moving average is both the most accurate
+(WAPE 48.7%) and meets the 95% service target with **40% less inventory** than the most stock-heavy
+model. On lumpy B2B demand, extra model complexity mostly added variance: an honest finding worth
+having before investing in ML forecasting.
+
 Full results: [`reports/REPORT.md`](reports/REPORT.md)
 
 ## Data

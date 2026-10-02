@@ -91,14 +91,30 @@ def kaggle() -> pd.DataFrame:
         .index
     )
     weekly = weekly.set_index(["sku", "warehouse"]).loc[top].reset_index()
-    # Fill weeks with no orders with zero demand.
+    # Give every series the same full weekly calendar, with zero demand in weeks without orders.
+    weeks = pd.date_range(weekly["week"].min(), weekly["week"].max(), freq="W-MON")
+    meta = weekly.groupby(["sku", "warehouse"])["category"].first()
     full = (
-        weekly.set_index("week")
-        .groupby(["sku", "warehouse", "category"])["demand"]
-        .resample("W-MON")
+        weekly.groupby(["sku", "warehouse", "week"])["demand"]
         .sum()
         .reset_index()
+        .set_index(["sku", "warehouse", "week"])
     )
+    frames = []
+    for (sku, wh), cat in meta.items():
+        series = full.loc[(sku, wh)]["demand"].reindex(weeks, fill_value=0)
+        frames.append(
+            pd.DataFrame(
+                {
+                    "sku": sku,
+                    "warehouse": wh,
+                    "category": cat,
+                    "week": weeks,
+                    "demand": series.to_numpy(),
+                }
+            )
+        )
+    full = pd.concat(frames, ignore_index=True)
     return _with_series_id(full)
 
 
